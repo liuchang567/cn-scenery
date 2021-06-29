@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="map" id="map"></div>
+    <div class="map" id="map">cn-scenery</div>
   </div>
 </template>
 
