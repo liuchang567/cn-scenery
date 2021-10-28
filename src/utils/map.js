@@ -1,5 +1,4 @@
 import * as Cesium from 'cesium'
-import CesiumNavigation from 'cesium-navigation-es6'
 
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibGN5eSIsImEiOiJja2htc2c0OTQwaW9vMnBxcTl4c2d1NDd1In0.drhx9Uv2m-a35dsoGEencw'
 const MAPBOX_STYLE_ID = 'ckhmthlhs07w619nufi7i57gf'
@@ -12,7 +11,7 @@ export function initCesiumToken () {
 
 export function CreateMap(container, options = {}) {
   const tileKeys = options.tileKeys || ['mapbox']
-  const pos = options.pos || [116.435314, 40.960521, 15000000.0]
+  const pos = options.pos || [116.435314, 40.960521, 20000000.0]
   const initialPosition = new Cesium.Cartesian3.fromDegrees(pos[0], pos[1], pos[2])
   const hpr = options.hpr || [0.0, -90.0, 0.0]
   const initialOrientation = new Cesium.HeadingPitchRoll.fromDegrees(hpr[0], hpr[1], hpr[2])
@@ -37,7 +36,7 @@ export function CreateMap(container, options = {}) {
   })
 
   // 显示帧率
-  viewer.scene.debugShowFramesPerSecond = true;
+  viewer.scene.debugShowFramesPerSecond = true
 
   // 删除默认图层
   viewer.imageryLayers.remove(viewer.imageryLayers.get(0))
@@ -47,29 +46,12 @@ export function CreateMap(container, options = {}) {
 
   // 自然光照
   viewer.scene.globe.enableLighting = true
-
-  // viewer.scene.screenSpaceCameraController.minimumZoomDistance =  20
+  //雾效
+  viewer.scene.fog.enabled = true
+  viewer.shadows = true
+  //大气：
+  viewer.scene.skyAtmosphere.saturationShift = 1.0
   
-
-  const navigationOpt = {
-    // 用于在使用重置导航重置地图视图时设置默认视图控制。接受的值是Cesium.Cartographic 和 Cesium.Rectangle.
-    defaultResetView: new Cesium.Cartographic.fromDegrees(pos[0], pos[1], pos[2]),
-    enableCompass: true, // 用于启用或禁用罗盘
-    enableZoomControls: true, // 用于启用或禁用缩放控件
-    enableDistanceLegend: true, // 用于启用或禁用距离图例
-    enableCompassOuterRing: true // 用于启用或禁用指南针外环
-  }
-  CesiumNavigation(viewer, navigationOpt)
-
-  // 重写resetView
-  viewer.cesiumNavigation.navigationViewModel.controls[1].__proto__.resetView = function () {
-    viewer.camera.flyTo({
-      destination: initialPosition,
-      orientation: initialOrientation,
-      endTransform: Cesium.Matrix4.IDENTITY
-    })
-  }
-
   return ObserverMapTiles(viewer, tileKeys)
 }
 
@@ -77,9 +59,12 @@ const urls = {
   mapbox: '',
   tianditu: 'http://t0.tianditu.gov.cn/img_w/wmts?tk=ebf64362215c081f8317203220f133eb',
   google: 'http://mt1.google.cn/vt/lyrs=s&hl=zh-CN&x={x}&y={y}&z={z}',
-  mapboxB: 'https://api.mapbox.com/styles/v1/' + MAPBOX_USERNAME + '/' + MAPBOX_STYLE_ID + '/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_ACCESS_TOKEN
+  mapboxB: 'https://api.mapbox.com/styles/v1/' + MAPBOX_USERNAME + '/' + MAPBOX_STYLE_ID + '/tiles/256/{z}/{x}/{y}?access_token=' + MAPBOX_ACCESS_TOKEN,
+  //天地图
+  TDTIMGC: 'https://{s}.tianditu.gov.cn/img_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=img&tileMatrixSet=c&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=ebf64362215c081f8317203220f133eb',
+  //标注
+  TDTCIAC: 'https://{s}.tianditu.gov.cn/cia_c/wmts?service=wmts&request=GetTile&version=1.0.0&LAYER=cia&tileMatrixSet=c&TileMatrix={TileMatrix}&TileRow={TileRow}&TileCol={TileCol}&style=default&format=tiles&tk=ebf64362215c081f8317203220f133eb',
 }
-
 
 function ObserverMapTiles(map, tileKeys) {
   map.tiles = {
@@ -100,7 +85,31 @@ function ObserverMapTiles(map, tileKeys) {
     mapboxB: new Cesium.ImageryLayer(new Cesium.UrlTemplateImageryProvider({
       url: urls.mapboxB,
       maximumLevel: 22
-    }))
+    })),
+    TDT_IMG_C: new Cesium.ImageryLayer (new Cesium.WebMapTileServiceImageryProvider({
+			url: urls.TDTIMGC,
+			layer: 'tdtImg_c',
+			style: 'default',
+			format: 'tiles',
+			tileMatrixSetID: 'c',
+			subdomains:['t0','t1','t2','t3','t4','t5','t6','t7'],
+			tilingScheme:new Cesium.GeographicTilingScheme(),
+			tileMatrixLabels:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19'],
+			maximumLevel:50,
+			show: false
+			})),
+			TDT_CIA_C: new Cesium.ImageryLayer (new Cesium.WebMapTileServiceImageryProvider({
+				url: urls.TDTCIAC,
+				layer: 'tdtImg_c',
+				style: 'default',
+				format: 'tiles',
+				tileMatrixSetID: 'c',
+				subdomains:['t0','t1','t2','t3','t4','t5','t6','t7'],
+				tilingScheme:new Cesium.GeographicTilingScheme(),
+				tileMatrixLabels:['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19'],
+				maximumLevel:50,
+				show: false
+			}))
   }
   Object.defineProperty(map, 'tileKeys', {
     get: () => tileKeys,
