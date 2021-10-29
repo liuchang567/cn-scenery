@@ -11,10 +11,10 @@ export function initCesiumToken () {
 
 export function CreateMap(container, options = {}) {
   const tileKeys = options.tileKeys || ['mapbox']
-  const pos = options.pos || [116.435314, 40.960521, 20000000.0]
-  const initialPosition = new Cesium.Cartesian3.fromDegrees(pos[0], pos[1], pos[2])
-  const hpr = options.hpr || [0.0, -90.0, 0.0]
-  const initialOrientation = new Cesium.HeadingPitchRoll.fromDegrees(hpr[0], hpr[1], hpr[2])
+  // const pos = options.pos || [116.435314, 40.960521, 20000000.0]
+  // const initialPosition = new Cesium.Cartesian3.fromDegrees(pos[0], pos[1], pos[2])
+  // const hpr = options.hpr || [0.0, -90.0, 0.0]
+  // const initialOrientation = new Cesium.HeadingPitchRoll.fromDegrees(hpr[0], hpr[1], hpr[2])
   const defaultOptions = {
     scene3DOnly: true,
     geocoder: false,
@@ -29,11 +29,11 @@ export function CreateMap(container, options = {}) {
   }
   const viewer = new Cesium.Viewer(container, Object.assign({}, defaultOptions, options))
   // 初始化相机位置
-  viewer.camera.flyTo({
-    destination: initialPosition,
-    orientation: initialOrientation,
-    endTransform: Cesium.Matrix4.IDENTITY
-  })
+  // viewer.camera.flyTo({
+  //   destination: initialPosition,
+  //   orientation: initialOrientation,
+  //   endTransform: Cesium.Matrix4.IDENTITY
+  // })
 
   // 显示帧率
   viewer.scene.debugShowFramesPerSecond = true
