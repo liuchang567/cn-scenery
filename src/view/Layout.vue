@@ -108,15 +108,14 @@ export default {
     test2(){
       let longitude = 120.01231
       let latitude = 30.012+31
-      let altitude = 1.0
+      let altitude = 10000.0
       setInterval(() => {
         this.index++
         longitude += 0.001231313
         latitude += 0.001231313
-        altitude += 1
         const pos = new Cesium.Cartesian3.fromDegrees(longitude, latitude, altitude)
         this.entity.position = pos
-        this.setView(longitude, latitude)
+        // this.setView(longitude, latitude)
         // const pos2 = new Cesium.Cartesian3.fromDegrees(longitude, latitude - 0.1, 50000)
         // const initialOrientation = new Cesium.HeadingPitchRoll.fromDegrees(0.0, -70.0, 0.0)
         // this.camera.setView({
